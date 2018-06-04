@@ -9,9 +9,9 @@ use warnings;
 
 sub meta {
     +{
-        v => 2,
+        v => 3,
         enable_by_default => 0,
-        might_die => 1,
+        might_fail => 1,
         prio => 60, # a bit lower than normal
         precludes => [qr/\A(str_alami(_.+)?|str_natural)\z/],
     };
@@ -29,12 +29,12 @@ sub coerce {
     $res->{modules}{"DateTime::Format::Flexible"} //= 0;
     $res->{expr_coerce} = join(
         "",
-        "do { my \$res = DateTime::Format::Flexible->parse_datetime($dt); ",
-        ($coerce_to eq 'float(epoch)' ? "\$res = \$res->epoch; " :
-             $coerce_to eq 'Time::Moment' ? "\$res->set_time_zone('UTC'); \$res = Time::Moment->from_object(\$res); " :
-             $coerce_to eq 'DateTime' ? "" :
+        "do { my \$datetime; eval { \$datetime = DateTime::Format::Flexible->parse_datetime($dt) }; ",
+        ($coerce_to eq 'float(epoch)' ? "if (\$@) { ['Invalid date format'] } else { [undef, \$datetime->epoch] } " :
+             $coerce_to eq 'Time::Moment' ? "if (\$@) { ['Invalid date format'] } else { \$datetime->set_time_zone('UTC'); [undef, Time::Moment->from_object(\$datetime) ] } " :
+             $coerce_to eq 'DateTime' ? "if (\$@) { ['Invalid date format'] } else { [undef, \$datetime] } " :
              (die "BUG: Unknown coerce_to '$coerce_to'")),
-        "\$res }",
+        "}",
     );
 
     $res;

@@ -1,9 +1,9 @@
-0.002   2018-06-04 (PERLANCAR)
+0.002   2018-06-04  Released-By: PERLANCAR
 
 	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata
 	  version 3).
 
 
-0.001   2016-06-30 (PERLANCAR)
+0.001   2016-06-30  Released-By: PERLANCAR
 
         - First release.
